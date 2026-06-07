@@ -20,6 +20,7 @@ defmodule ErrorTracker.Error do
           status: :resolved | :unresolved,
           fingerprint: String.t(),
           last_occurrence_at: DateTime.t(),
+          environment: String.t(),
           muted: boolean()
         }
 
@@ -31,6 +32,7 @@ defmodule ErrorTracker.Error do
     field :status, Ecto.Enum, values: [:resolved, :unresolved], default: :unresolved
     field :fingerprint, :binary
     field :last_occurrence_at, :utc_datetime_usec
+    field :environment, :string
     field :muted, :boolean
 
     has_many :occurrences, ErrorTracker.Occurrence
@@ -65,6 +67,7 @@ defmodule ErrorTracker.Error do
     |> Ecto.Changeset.put_change(:reason, reason)
     |> Ecto.Changeset.put_change(:fingerprint, Base.encode16(fingerprint))
     |> Ecto.Changeset.put_change(:last_occurrence_at, DateTime.utc_now())
+    |> Ecto.Changeset.put_change(:environment, ErrorTracker.environment())
     |> Ecto.Changeset.apply_action(:new)
   end
 

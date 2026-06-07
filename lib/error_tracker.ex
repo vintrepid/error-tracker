@@ -159,6 +159,7 @@ defmodule ErrorTracker do
 
     with {:ok, updated_error} <- Repo.update(changeset) do
       Telemetry.resolved_error(updated_error)
+      notify_status_change(updated_error, :resolved)
       {:ok, updated_error}
     end
   end
@@ -172,6 +173,7 @@ defmodule ErrorTracker do
 
     with {:ok, updated_error} <- Repo.update(changeset) do
       Telemetry.unresolved_error(updated_error)
+      notify_status_change(updated_error, :unresolved)
       {:ok, updated_error}
     end
   end
@@ -282,6 +284,16 @@ defmodule ErrorTracker do
     Process.get(:error_tracker_breadcrumbs, [])
   end
 
+  @doc """
+  Returns the environment name stamped on new errors and occurrences.
+  """
+  @spec environment() :: String.t()
+  def environment do
+    :error_tracker
+    |> Application.get_env(:environment, "unknown")
+    |> to_string()
+  end
+
   defp enabled? do
     !!Application.get_env(:error_tracker, :enabled, true)
   end
@@ -298,6 +310,26 @@ defmodule ErrorTracker do
     if filter_mod,
       do: filter_mod.sanitize(context),
       else: context
+  end
+
+  defp notify_status_change(error, status) do
+    case Application.get_env(:error_tracker, :status_change_callback) do
+      nil ->
+        :ok
+
+      {module, function} ->
+        apply(module, function, [error, status])
+
+      module when is_atom(module) ->
+        module.error_tracker_status_changed(error, status)
+    end
+  rescue
+    error ->
+      require Logger
+
+      Logger.error("[ErrorTracker] status change callback failed: #{Exception.message(error)}")
+
+      :ok
   end
 
   defp normalize_exception(%struct{} = ex, _stacktrace) when is_exception(ex) do
@@ -329,7 +361,7 @@ defmodule ErrorTracker do
   defp upsert_error!(error, stacktrace, context, breadcrumbs, reason) do
     status_and_muted_query =
       from e in Error,
-        where: [fingerprint: ^error.fingerprint],
+        where: [fingerprint: ^error.fingerprint, environment: ^error.environment],
         select: {e.status, e.muted}
 
     {existing_status, muted} =
@@ -350,7 +382,7 @@ defmodule ErrorTracker do
             _other ->
               Repo.insert!(error,
                 on_conflict: [set: [status: :unresolved, last_occurrence_at: DateTime.utc_now()]],
-                conflict_target: :fingerprint
+                conflict_target: [:environment, :fingerprint]
               )
           end)
 
@@ -361,6 +393,7 @@ defmodule ErrorTracker do
             stacktrace: stacktrace,
             context: context,
             breadcrumbs: breadcrumbs,
+            environment: error.environment,
             reason: reason
           })
           |> Repo.insert!()

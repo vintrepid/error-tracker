@@ -122,6 +122,10 @@ defmodule ErrorTracker.Web.Live.Dashboard do
     where(query, [error], error.status == ^status)
   end
 
+  defp do_filter({:environment, environment}, query) do
+    where(query, [error], error.environment == ^environment)
+  end
+
   defp do_filter({field, value}, query) do
     # Postgres provides the ILIKE operator which produces a case-insensitive match between two
     # strings. SQLite3 only supports LIKE, which is case-insensitive for ASCII characters.

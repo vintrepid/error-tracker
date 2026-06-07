@@ -8,7 +8,7 @@ defmodule ErrorTracker.Migration.Postgres do
   alias ErrorTracker.Migration.SQLMigrator
 
   @initial_version 1
-  @current_version 5
+  @current_version 6
   @default_prefix "public"
 
   @impl ErrorTracker.Migration

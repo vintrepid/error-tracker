@@ -5,6 +5,7 @@ defmodule ErrorTracker.Web.Search do
     reason: :string,
     source_line: :string,
     source_function: :string,
+    environment: :string,
     status: :string
   }
 

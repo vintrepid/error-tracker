@@ -17,6 +17,7 @@ defmodule ErrorTracker.Occurrence do
   schema "error_tracker_occurrences" do
     field :reason, :string
 
+    field :environment, :string
     field :context, :map
     field :breadcrumbs, {:array, :string}
 
@@ -29,7 +30,7 @@ defmodule ErrorTracker.Occurrence do
   @doc false
   def changeset(occurrence, attrs) do
     occurrence
-    |> cast(attrs, [:context, :reason, :breadcrumbs])
+    |> cast(attrs, [:context, :reason, :breadcrumbs, :environment])
     |> maybe_put_stacktrace()
     |> validate_required([:reason, :stacktrace])
     |> validate_context()
@@ -61,10 +62,13 @@ defmodule ErrorTracker.Occurrence do
           context
         rescue
           _e ->
-            Logger.warning("[ErrorTracker] Context has been ignored: it is not serializable to JSON.")
+            Logger.warning(
+              "[ErrorTracker] Context has been ignored: it is not serializable to JSON."
+            )
 
             %{
-              error: "Context not stored because it contains information not serializable to JSON."
+              error:
+                "Context not stored because it contains information not serializable to JSON."
             }
         end
 

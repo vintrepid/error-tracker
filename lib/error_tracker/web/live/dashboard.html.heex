@@ -1,7 +1,7 @@
 <.form
   for={@search_form}
   id="search"
-  class="mb-4 text-black grid md:grid-cols-4 grid-cols-2 gap-2"
+  class="mb-4 text-black grid md:grid-cols-5 grid-cols-2 gap-2"
   phx-change="search"
 >
   <input
@@ -40,6 +40,14 @@
       Resolved
     </option>
   </select>
+  <select
+    name={@search_form[:environment].name}
+    class="border text-sm rounded-lg block p-2.5 bg-gray-700 light:bg-white border-gray-600 light:border-gray-300 placeholder-gray-400 text-white light:text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+  >
+    <option value="" selected={@search_form[:environment].value == ""}>All environments</option>
+    <option value="dev" selected={@search_form[:environment].value == "dev"}>Dev</option>
+    <option value="prod" selected={@search_form[:environment].value == "prod"}>Prod</option>
+  </select>
 </.form>
 
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg ring-1 ring-gray-900 light:ring-gray-200">
@@ -48,13 +56,14 @@
       <tr>
         <th scope="col" class="px-4 pr-2 w-72">Error</th>
         <th scope="col" class="px-4 py-3 w-72">Occurrences</th>
+        <th scope="col" class="px-4 py-3 w-24">Env</th>
         <th scope="col" class="px-4 py-3 w-28">Status</th>
         <th scope="col" class="px-4 py-3 w-28"></th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td :if={@errors == []} colspan="4" class="text-center py-8 font-extralight">
+        <td :if={@errors == []} colspan="5" class="text-center py-8 font-extralight">
           No errors to show 🎉
         </td>
       </tr>
@@ -79,8 +88,14 @@
           </p>
         </td>
         <td class="px-4 py-4">
-          <p>Last: {format_datetime(error.last_occurrence_at)}</p>
+          <p title={format_datetime(error.last_occurrence_at)}>
+            Last: {format_relative_datetime(error.last_occurrence_at)}
+          </p>
           <p>Total: {@occurrences[error.id]}</p>
+        </td>
+        <td class="px-4 py-4">
+          <.badge :if={error.environment == "prod"} color={:red}>Prod</.badge>
+          <.badge :if={error.environment != "prod"} color={:blue}>{error.environment}</.badge>
         </td>
         <td class="px-4 py-4">
           <.badge :if={error.status == :resolved} color={:green}>Resolved</.badge>

@@ -9,6 +9,10 @@ defmodule ErrorTracker.Repo do
     dispatch(:update, [changeset], opts)
   end
 
+  def update!(changeset, opts \\ []) do
+    dispatch(:update!, [changeset], opts)
+  end
+
   def get(queryable, id, opts \\ []) do
     dispatch(:get, [queryable, id], opts)
   end

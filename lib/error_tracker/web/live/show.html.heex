@@ -127,7 +127,11 @@
     </.section>
 
     <.section title="Last seen">
-      <pre><%= format_datetime(@error.last_occurrence_at) %></pre>
+      <pre title={format_datetime(@error.last_occurrence_at)}><%= format_relative_datetime(@error.last_occurrence_at) %></pre>
+    </.section>
+
+    <.section title="Environment">
+      <pre><%= @error.environment %></pre>
     </.section>
 
     <.section title="First seen">
