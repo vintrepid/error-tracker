@@ -56,7 +56,7 @@
       <tr>
         <th scope="col" class="px-4 pr-2 w-72">Error</th>
         <th scope="col" class="px-4 py-3 w-72">Occurrences</th>
-        <th scope="col" class="px-4 py-3 w-24">Env</th>
+        <th scope="col" class="px-2 py-3 w-14 text-center">Env</th>
         <th scope="col" class="px-4 py-3 w-28">Status</th>
         <th scope="col" class="px-4 py-3 w-28"></th>
       </tr>
@@ -93,7 +93,7 @@
           </p>
           <p>Total: {@occurrences[error.id]}</p>
         </td>
-        <td class="px-4 py-4">
+        <td class="px-2 py-4 text-center">
           <.badge :if={error.environment == "prod"} color={:red}>Prod</.badge>
           <.badge :if={error.environment != "prod"} color={:blue}>{error.environment}</.badge>
         </td>
