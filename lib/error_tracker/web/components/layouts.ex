@@ -33,6 +33,25 @@ defmodule ErrorTracker.Web.Layouts do
     Keyword.get(config, key, default)
   end
 
+  attr :to, :string, required: true
+  attr :rest, :global
+
+  slot :inner_block, required: true
+
+  def navbar_item(assigns) do
+    ~H"""
+    <li>
+      <a
+        href={@to}
+        class="whitespace-nowrap flex-0 block py-2 px-3 rounded-lg text-white light:text-gray-900 hover:text-white light:hover:text-gray-900 hover:bg-gray-700 light:hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-sky-500"
+        {@rest}
+      >
+        {render_slot(@inner_block)}
+      </a>
+    </li>
+    """
+  end
+
   def navbar(assigns) do
     ~H"""
     <nav class="border-gray-400 light:border-gray-300 bg-gray-900 light:bg-gray-100">
@@ -121,25 +140,6 @@ defmodule ErrorTracker.Web.Layouts do
         </div>
       </div>
     </nav>
-    """
-  end
-
-  attr :to, :string, required: true
-  attr :rest, :global
-
-  slot :inner_block, required: true
-
-  def navbar_item(assigns) do
-    ~H"""
-    <li>
-      <a
-        href={@to}
-        class="whitespace-nowrap flex-0 block py-2 px-3 rounded-lg text-white light:text-gray-900 hover:text-white light:hover:text-gray-900 hover:bg-gray-700 light:hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-sky-500"
-        {@rest}
-      >
-        {render_slot(@inner_block)}
-      </a>
-    </li>
     """
   end
 end
