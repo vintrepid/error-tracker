@@ -6,12 +6,19 @@ defmodule ErrorTracker.Web.LayoutsTest do
 
   alias ErrorTracker.Web.Layouts
 
-  test "navbar items forward global anchor attributes" do
+  test "navbar items render the declared target attribute" do
     html = render_component(&external_navbar_item/1)
 
     assert html =~ ~s(href="https://example.com")
     assert html =~ ~s(target="_blank")
     assert html =~ "External documentation"
+  end
+
+  test "navbar items declare target in their component contract" do
+    attributes = Layouts.__components__()[:navbar_item].attrs
+
+    assert %{type: :string, required: false} =
+             Enum.find(attributes, &(&1.name == :target))
   end
 
   defp external_navbar_item(assigns) do

@@ -34,6 +34,7 @@ defmodule ErrorTracker.Web.Layouts do
   end
 
   attr :to, :string, required: true
+  attr :target, :string, default: nil
   attr :rest, :global
 
   slot :inner_block, required: true
@@ -43,6 +44,7 @@ defmodule ErrorTracker.Web.Layouts do
     <li>
       <a
         href={@to}
+        target={@target}
         class="whitespace-nowrap flex-0 block py-2 px-3 rounded-lg text-white light:text-gray-900 hover:text-white light:hover:text-gray-900 hover:bg-gray-700 light:hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-sky-500"
         {@rest}
       >
